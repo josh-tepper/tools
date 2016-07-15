@@ -1,0 +1,28 @@
+#! /bin/bash
+
+STAR_FILE=$HOME/.star
+
+if [ $# -ne 1 ]; then
+   echo "must provide only a single argument, the star name" >&2
+   exit 1
+fi
+
+star_name="$1"
+star_dir="$PWD"
+
+if [[ "$star_name" =~ [[:space:]] ]]; then
+   echo "star name may not contain whitespaces" >&2
+   exit 2
+fi
+
+
+if [ -e "$STAR_FILE" ]; then
+   existing_star=$(grep -m 1 -i "^$star_name\t.*" ${STAR_FILE})
+   if [ $? -eq 0 ]; then
+      echo $'star already exists:\n'$existing_star
+      exit 3
+   fi
+fi
+
+echo "$star_name"$'\t'"$star_dir" >> $STAR_FILE
+

@@ -4,7 +4,7 @@ STAR_FILE=$HOME/.star
 STAR_TEMP_FILE=$HOME/.star.temp
 
 if [ $# -ne 1 ]; then
-   echo "usage: starrm [case sensitive starname \"full-match\" regex]" >&2
+   echo "usage: starrm <case sensitive starname \"full-match\" regex>" >&2
    exit 1
 fi
 

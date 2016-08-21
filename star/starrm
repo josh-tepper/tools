@@ -1,0 +1,49 @@
+#! /bin/bash
+
+STAR_FILE=$HOME/.star
+STAR_TEMP_FILE=$HOME/.star.temp
+
+if [ $# -ne 1 ]; then
+   echo "usage: starrm [case sensitive starname \"full-match\" regex]" >&2
+   exit 1
+fi
+
+star_pattern="$1"
+# for rm, we want to match the whole string; add '^' and '$' to the beginning/end
+# of the regex:
+if [[ "${star_pattern:0:1}" != "^" ]]; then
+  star_pattern="^${star_pattern}"
+fi
+
+if [[ "${star_pattern: -1}" != "$" ]]; then
+  star_pattern="${star_pattern}\$"
+fi
+
+# delete the temp file if it already exists
+if [ -e "$STAR_TEMP_FILE" ]; then
+  rm "$STAR_TEMP_FILE"
+fi
+
+# matching only against the star names (not the star values -- ie, the paths)
+awk -F $'\t' '
+{
+  if ($1 ~ /'"$star_pattern"'/)
+    print("Removing:", $1, $2);
+    # we matched the remove pattern; do not output to the STAR_TEMP_FILE
+    # which will eventually become the new star file
+  else
+    print >> '"\"${STAR_TEMP_FILE}\""';
+}
+' \
+"$STAR_FILE"
+
+# if awk was successful; overwrite the old star file
+awk_retval=$?
+if [ "$awk_retval" -eq 0 ]; then
+  mv "$STAR_TEMP_FILE" "$STAR_FILE"
+else
+  echo "error: awk failed with status code: $awk_retval"
+  exit $awk_retval
+fi
+
+

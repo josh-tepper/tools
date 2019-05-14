@@ -7,7 +7,8 @@ function s() {
       return 2
    fi
    star_name=$1
-   star_dir=$(grep -m 1 -i "^${star_name}\t" $STAR_FILE | awk -F$'\t' '{print $2}')
+   tab=$'\t'
+   star_dir=$(grep -m 1 -i "^${star_name}${tab}" $STAR_FILE | awk -F$'\t' '{print $2}')
    if [ -z "$star_dir" ]; then
       echo "no starred dir found for ${star_name}" >&2
       return 1
